@@ -34,6 +34,21 @@ Grid generate_initial_conditions(int len_x, int len_y) {
 void solve_interior(Grid current, Grid previous) {
 } 
 
+void apply_boundary_conditions(Grid g) {
+	int i,j;
+	// North Boundary
+	for(i=0; i < g.len_x; i++) g.element(i,0) = 0;
+
+	// South Boundary
+	for(i=0; i < g.len_x; i++) g.element(i,g.len_y - 1) = 0;
+
+	// East Boundary
+	for(j=0; j < g.len_y; j++) g.element(0,j) = 0;
+
+	// West Boundary
+	for(j=0; j < g.len_y; j++) g.element(g.len_x - 1,j) = 0;
+}
+
 #define LEN_X 500
 #define LEN_Y 500
 #define LEN_T 10
@@ -50,6 +65,7 @@ int main(int argc, char** argv) {
 	int tau;
 	for(tau = 1; tau < LEN_T; tau++) {
 		grids_by_timestep[tau] = alloc_grid(LEN_X, LEN_Y);
+		apply_boundary_conditions(grids_by_timestep[tau]);
 		solve_interior(grids_by_timestep[tau], grids_by_timestep[tau - 1]);
 	}
 	
