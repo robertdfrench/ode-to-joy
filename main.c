@@ -31,7 +31,28 @@ Grid generate_initial_conditions(int len_x, int len_y) {
 	return initial_conditions;
 }
 
-void solve_interior(Grid current, Grid previous) {
+void solve_interior(Grid current, Grid previous, Stepsize h) {
+	int i,j;
+	int max_i = current.len_x - 2;
+	int max_j = current.len_y - 2;
+	for(i = 1; i < max_i; i++) {
+		for(j = 1; j < max_j; j++) {
+			double uijn = previous.element(i,j);
+			double t_contribution = uijn;
+
+			double uiP1jn = previous.element(i+1,j);
+			double uiM1jn = previous.element(i-1,j);
+			double x_contribution = h.t * (uiP1jn - 2*uijn + uiM1jn) / (h.x * h.x);
+
+			double uijP1n = previous.element(i,j+1);
+			double uijM1n = previous.element(i,j-1);
+			double y_contribution = h.t * (uijP1n - 2*uijn + uijM1n) / (h.y * h.y);
+
+			double uijnP1 = t_contribution + x_contribution + y_contribution;
+			current.element(i,j) = uijnP1;
+	
+		}
+	}
 } 
 
 void apply_boundary_conditions(Grid g) {
@@ -53,11 +74,18 @@ void apply_boundary_conditions(Grid g) {
 #define LEN_Y 500
 #define LEN_T 10
 
+typedef struct stepsize_t {
+	double x;
+	double y;
+	double t;
+} Stepsize;
+
 int main(int argc, char** argv) {
 	Grid initial_conditions = generate_initial_conditions(LEN_X, LEN_Y);
-	double hx = 1.0 / ((double) LEN_X);
-	double hy = 1.0 / ((double) LEN_Y);
-	double ht = 1.0 / ((double) LEN_T);
+	Stepsize h;
+	h.x = 1.0 / ((double) LEN_X);
+	h.y = 1.0 / ((double) LEN_Y);
+	h.t = 1.0 / ((double) LEN_T);
 
 	Grid[LEN_T] grids_by_timestep;
 	grids_by_timestep[0] = initial_conditions;
@@ -66,7 +94,7 @@ int main(int argc, char** argv) {
 	for(tau = 1; tau < LEN_T; tau++) {
 		grids_by_timestep[tau] = alloc_grid(LEN_X, LEN_Y);
 		apply_boundary_conditions(grids_by_timestep[tau]);
-		solve_interior(grids_by_timestep[tau], grids_by_timestep[tau - 1]);
+		solve_interior(grids_by_timestep[tau], grids_by_timestep[tau - 1],h);
 	}
 	
 	return 0;
