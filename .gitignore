@@ -25,3 +25,6 @@
 # Vim Swap files
 *.swp
 *.swo
+
+# Custom Makefile variables
+make.inc

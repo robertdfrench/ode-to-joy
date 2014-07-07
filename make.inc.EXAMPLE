@@ -1,0 +1,5 @@
+# Copy this to make.inc and fill in
+# appropriate values for your environment
+
+## Path where you'd like the program to be installed
+DESTINATION=$(MEMBERWORK)/stf007
