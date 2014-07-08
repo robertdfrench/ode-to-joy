@@ -20,14 +20,14 @@ Grid alloc_grid(int len_x, int len_y) {
 	Grid g;
 	g.len_x = len_x;
 	g.len_y = len_y;
-	g.internal_storage = (float*)malloc(sizeof(float) * len_x * len_y);
+	g.internal_storage = (double*)malloc(sizeof(double) * len_x * len_y);
 	return g;
 }
 
 Grid generate_initial_conditions(int len_x, int len_y) {
 	Grid initial_conditions = alloc_grid(len_x, len_y);
 	int i,j;
-	float hx = 1.0 / ((float) len_x);
+	double hx = 1.0 / ((double) len_x);
 	for (i = 0; i < len_x; i++) {
 		for (j = 0; j < len_y; j++) {
 			grid_element(initial_conditions,i,j) = sin(i * hx);
@@ -54,7 +54,7 @@ void apply_boundary_conditions(Grid g) {
 void store_grid(Grid g) {
 	FILE* gridFile = fopen("output.otj_grid","w");
 	size_t num_cells = g.len_x * g.len_y;
-	size_t cell_size = sizeof(float);
+	size_t cell_size = sizeof(double);
 	size_t elements_written = fwrite(g.internal_storage, cell_size, num_cells, gridFile);
 	if (elements_written < num_cells) {
 		printf("An error occurred while saving the grid.\n");
@@ -109,10 +109,16 @@ GridOptions parse_grid_options(int argc, char** argv) {
 
 Stepsize stepsize_from_grid_options(GridOptions go) {
 	Stepsize h;
-	h.x = 1.0 / ((float) go.len_x);
-	h.y = 1.0 / ((float) go.len_y);
-	h.t = 1.0 / ((float) go.len_t);
+	h.x = 1.0 / ((double) go.len_x);
+	h.y = 1.0 / ((double) go.len_y);
+	h.t = 1.0 / ((double) go.len_t);
 	return h;
+}
+
+void swap_grids(Grid a, Grid b) {
+	double* temp = a.internal_storage;
+	a.internal_storage = b.internal_storage;
+	b.internal_storage = temp;
 }
 
 int main(int argc, char** argv) {
@@ -123,21 +129,25 @@ int main(int argc, char** argv) {
 	Grid initial_conditions = generate_initial_conditions(go.len_x, go.len_y);
 	stop_timer(tm);
 
-	Stepsize h = stepsize_from_grid_options(go);
-	Grid grids_by_timestep[go.len_t];
-	grids_by_timestep[0] = initial_conditions;
 
 	tm = start_timer("Solve Problem");
+	Stepsize h = stepsize_from_grid_options(go);
+
+	Grid current_grid = createDeviceGrid(initial_conditions);
+	Grid previous_grid = createAndCopyDeviceGrid(initial_conditions);
+	swap_grids(current_grid, previous_grid);
 	int tau;
 	for(tau = 1; tau < go.len_t; tau++) {
-		grids_by_timestep[tau] = alloc_grid(go.len_x, go.len_y);
-		apply_boundary_conditions(grids_by_timestep[tau]);
-		solve_interior(grids_by_timestep[tau], grids_by_timestep[tau - 1],h);
+		swap_grids(current_grid, previous_grid);
+		apply_boundary_conditions(current_grid);
+		solve_interior(current_grid, previous_grid,h);
 	}
+	Grid solution_grid = alloc_grid(go.len_x, go.len_y);
+	retrieveDeviceGrid(solution_grid, current_grid);
 	stop_timer(tm);
 
 	tm = start_timer("Store Grid");
-	store_grid(grids_by_timestep[go.len_t - 1]);
+	store_grid(solution_grid);
 	stop_timer(tm);
 	
 	return 0;
