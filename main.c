@@ -4,9 +4,9 @@
 #include <mpi.h>
 #include <string.h>
 
+#include "stepsize.h"
 #include "grid.h"
 #include "solve_interior.h"
-#include "stepsize.h"
 
 
 typedef struct grid_options_t {

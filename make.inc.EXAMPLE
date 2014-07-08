@@ -3,3 +3,12 @@
 
 ## Path where you'd like the program to be installed
 DESTINATION=$(MEMBERWORK)/stf007
+
+## MPICC
+MPICC=mpicc
+
+## NVCC Command
+NVCC=/Developer/NVIDIA/CUDA-6.0/bin/nvcc -ccbin=/usr/bin/clang -arch=sm_35
+ 
+## Cuda Libs
+CUDA_LIBS=/Developer/NVIDIA/CUDA-6.0/lib

@@ -28,3 +28,6 @@
 
 # Custom Makefile variables
 make.inc
+
+# OTJ Output files
+*.otj_grid

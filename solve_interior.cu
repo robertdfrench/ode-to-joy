@@ -1,6 +1,6 @@
 #include <cuda.h>
-#include "grid.h"
 #include "stepsize.h"
+#include "grid.h"
 
 __global__ void solve_interior_cell(Grid previous, Grid current, Stepsize h) {
 	
