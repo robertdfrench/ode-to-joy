@@ -3,17 +3,10 @@
 #include <math.h>
 #include <mpi.h>
 
-typedef struct stepsize_t {
-	double x;
-	double y;
-	double t;
-} Stepsize;
+#include "grid.h"
+#include "solve_interior.h"
+#include "stepsize.h"
 
-typedef struct grid_t {
-	double* internal_storage;
-	int len_x;
-	int len_y;
-} Grid;
 
 typedef struct grid_options_t {
 	size_t len_x;
@@ -21,20 +14,19 @@ typedef struct grid_options_t {
 	size_t len_t;
 } GridOptions;
 
-#define grid_element(g,i,j) g.internal_storage[(i * g.len_x) + (j - 1)]
 
 Grid alloc_grid(int len_x, int len_y) {
 	Grid g;
 	g.len_x = len_x;
 	g.len_y = len_y;
-	g.internal_storage = (double*)malloc(sizeof(double) * len_x * len_y);
+	g.internal_storage = (float*)malloc(sizeof(float) * len_x * len_y);
 	return g;
 }
 
 Grid generate_initial_conditions(int len_x, int len_y) {
 	Grid initial_conditions = alloc_grid(len_x, len_y);
 	int i,j;
-	double hx = 1.0 / ((double) len_x);
+	float hx = 1.0 / ((float) len_x);
 	for (i = 0; i < len_x; i++) {
 		for (j = 0; j < len_y; j++) {
 			grid_element(initial_conditions,i,j) = sin(i * hx);
@@ -42,29 +34,6 @@ Grid generate_initial_conditions(int len_x, int len_y) {
 	}
 	return initial_conditions;
 }
-
-void solve_interior(Grid current, Grid previous, Stepsize h) {
-	int i,j;
-	int max_i = current.len_x - 2;
-	int max_j = current.len_y - 2;
-	for(i = 1; i < max_i; i++) {
-		for(j = 1; j < max_j; j++) {
-			double uijn = grid_element( previous,i,j);
-			double t_contribution = uijn;
-
-			double uiP1jn = grid_element( previous,i+1,j);
-			double uiM1jn = grid_element(previous,i-1,j);
-			double x_contribution = h.t * (uiP1jn - 2*uijn + uiM1jn) / (h.x * h.x);
-
-			double uijP1n = grid_element(previous,i,j+1);
-			double uijM1n = grid_element(previous,i,j-1);
-			double y_contribution = h.t * (uijP1n - 2*uijn + uijM1n) / (h.y * h.y);
-
-			double uijnP1 = t_contribution + x_contribution + y_contribution;
-			grid_element(current,i,j) = uijnP1;	
-		}
-	}
-} 
 
 void apply_boundary_conditions(Grid g) {
 	int i,j;
@@ -84,7 +53,7 @@ void apply_boundary_conditions(Grid g) {
 void store_grid(Grid g) {
 	FILE* gridFile = fopen("output.otj_grid","w");
 	size_t num_cells = g.len_x * g.len_y;
-	size_t cell_size = sizeof(double);
+	size_t cell_size = sizeof(float);
 	size_t elements_written = fwrite(g.internal_storage, cell_size, num_cells, gridFile);
 	if (elements_written < num_cells) {
 		printf("An error occurred while saving the grid.\n");
@@ -139,9 +108,9 @@ GridOptions parse_grid_options(int argc, char** argv) {
 
 Stepsize stepsize_from_grid_options(GridOptions go) {
 	Stepsize h;
-	h.x = 1.0 / ((double) go.len_x);
-	h.y = 1.0 / ((double) go.len_y);
-	h.t = 1.0 / ((double) go.len_t);
+	h.x = 1.0 / ((float) go.len_x);
+	h.y = 1.0 / ((float) go.len_y);
+	h.t = 1.0 / ((float) go.len_t);
 	return h;
 }
 
