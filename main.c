@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <mpi.h>
+#include <string.h>
 
 #include "grid.h"
 #include "solve_interior.h"
