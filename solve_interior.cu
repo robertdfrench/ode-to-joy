@@ -2,6 +2,26 @@
 #include "stepsize.h"
 #include "grid.h"
 
+__global__ void north_boundary(Grid g) {
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	if(i < g.len_x) grid_element(g,i,0) = 0.0;
+}
+
+__global__ void south_boundary(Grid g) {
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	if(i < g.len_x) grid_element(g,i,g.len_y - 1) = 0.0;
+}
+
+__global__ void east_boundary(Grid g) {
+	int j = blockIdx.y * blockDim.y + threadIdx.y;
+	if(j < g.len_y) grid_element(g,0,j) = 0.0;
+}
+
+__global__ void west_boundary(Grid g) {
+	int j = blockIdx.y * blockDim.y + threadIdx.y;
+	if(j < g.len_y) grid_element(g,g.len_x - 1,j) = 0.0;
+}
+
 __global__ void solve_interior_cell(Grid previous, Grid current, Stepsize h) {
 	
 	int i = blockIdx.x * blockDim.x + threadIdx.x + 1;
@@ -50,9 +70,11 @@ extern "C" void solve_interior(Grid current, Grid previous, Stepsize h) {
 
 }
 
+
+
 extern "C" void apply_boundary_conditions(Grid g) {
-	int max_i = current.len_x - 2;
-	int max_j = current.len_y - 2;
+	int max_i = g.len_x - 2;
+	int max_j = g.len_y - 2;
 	dim3 threadsPerBlock(1024);
 	dim3 numHorizontalBlocks(max_i / 1024 + 1);
 	dim3 numVerticalBlocks(max_j / 1024 + 1);

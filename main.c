@@ -36,21 +36,6 @@ Grid generate_initial_conditions(int len_x, int len_y) {
 	return initial_conditions;
 }
 
-void apply_boundary_conditions(Grid g) {
-	int i,j;
-	// North Boundary
-	for(i=0; i < g.len_x; i++) grid_element(g,i,0) = 0;
-
-	// South Boundary
-	for(i=0; i < g.len_x; i++) grid_element(g,i,g.len_y - 1) = 0;
-
-	// East Boundary
-	for(j=0; j < g.len_y; j++) grid_element(g,0,j) = 0;
-
-	// West Boundary
-	for(j=0; j < g.len_y; j++) grid_element(g,g.len_x - 1,j) = 0;
-}
-
 void store_grid(Grid g) {
 	FILE* gridFile = fopen("output.otj_grid","w");
 	size_t num_cells = g.len_x * g.len_y;
