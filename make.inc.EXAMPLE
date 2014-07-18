@@ -11,4 +11,4 @@ MPICC=mpicc
 NVCC=/Developer/NVIDIA/CUDA-6.0/bin/nvcc -ccbin=/usr/bin/clang -arch=sm_35
  
 ## Cuda Libs
-CUDA_LIBS=/Developer/NVIDIA/CUDA-6.0/lib
+CUDA_LIBRARY_PATH=-L/Developer/NVIDIA/CUDA-6.0/lib
