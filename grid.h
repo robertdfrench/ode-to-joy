@@ -10,4 +10,5 @@ typedef struct grid_t {
 #define grid_element(g,i,j) g.internal_storage[(i * g.len_x) + (j - 1)]
 
 void store_grid(Grid g);
+Grid alloc_grid(int len_x, int len_y);
 #endif

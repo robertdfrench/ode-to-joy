@@ -16,13 +16,6 @@ typedef struct grid_options_t {
 } GridOptions;
 
 
-Grid alloc_grid(int len_x, int len_y) {
-	Grid g;
-	g.len_x = len_x;
-	g.len_y = len_y;
-	g.internal_storage = (double*)malloc(sizeof(double) * len_x * len_y);
-	return g;
-}
 
 Grid generate_initial_conditions(int len_x, int len_y) {
 	Grid initial_conditions = alloc_grid(len_x, len_y);
