@@ -8,4 +8,6 @@ typedef struct grid_t {
 
 #define grid_size(g) sizeof(double) * g.len_x * g.len_y
 #define grid_element(g,i,j) g.internal_storage[(i * g.len_x) + (j - 1)]
+
+void store_grid(Grid g);
 #endif
