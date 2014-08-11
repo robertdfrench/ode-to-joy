@@ -8,6 +8,7 @@
 #include "grid.h"
 #include "solve_interior.h"
 #include "grid_options.h"
+#include "timing_measurement.h"
 
 Grid generate_initial_conditions(int len_x, int len_y) {
 	Grid initial_conditions = alloc_grid(len_x, len_y);
@@ -20,24 +21,6 @@ Grid generate_initial_conditions(int len_x, int len_y) {
 	}
 	return initial_conditions;
 }
-	
-typedef struct timing_measurement_t {
-	double beginning;
-	double end;
-	char* message;
-} TimingMeasurement;
-
-TimingMeasurement start_timer(char* message) {
-	TimingMeasurement tm;
-	tm.message = message;
-	tm.beginning = MPI_Wtime();
-	tm.end = tm.beginning;
-	return tm;
-}
-
-#define stop_timer(tm) printf("[Timer] %s: %f seconds\n", tm.message, MPI_Wtime() - tm.beginning); 
-
-
 
 void swap_grids(Grid a, Grid b) {
 	double* temp = a.internal_storage;
