@@ -5,4 +5,5 @@ typedef struct stepsize_t {
 	float y;
 	float t;
 } Stepsize;
+Stepsize stepsize_from_grid_options(GridOptions go);
 #endif

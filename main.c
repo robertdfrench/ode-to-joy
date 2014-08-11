@@ -76,13 +76,6 @@ GridOptions parse_grid_options(int argc, char** argv) {
 	return go;
 }
 
-Stepsize stepsize_from_grid_options(GridOptions go) {
-	Stepsize h;
-	h.x = 1.0 / ((double) go.len_x);
-	h.y = 1.0 / ((double) go.len_y);
-	h.t = 1.0 / ((double) go.len_t);
-	return h;
-}
 
 void swap_grids(Grid a, Grid b) {
 	double* temp = a.internal_storage;
