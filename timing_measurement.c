@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include "timing_measurement.h"
 
-void stop_timer(TimingMeasurement tm) {
+void OTJ_Timer_Stop(OTJ_Timer tm) {
 	printf("[Timer] %s: %f seconds\n", tm.message, MPI_Wtime() - tm.beginning);
 }
 
-TimingMeasurement start_timer(char* message) {
-	TimingMeasurement tm;
+OTJ_Timer OTJ_Timer_Start(char* message) {
+	OTJ_Timer tm;
 	tm.message = message;
 	tm.beginning = MPI_Wtime();
 	tm.end = tm.beginning;

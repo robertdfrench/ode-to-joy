@@ -32,12 +32,12 @@ int main(int argc, char** argv) {
 	MPI_Init(&argc, &argv);
 	GridOptions go = parse_grid_options(argc, argv);
 
-	TimingMeasurement tm = start_timer("Initial Conditions");
+	OTJ_Timer tm = OTJ_Timer_Start("Initial Conditions");
 	Grid initial_conditions = generate_initial_conditions(go.len_x, go.len_y);
-	stop_timer(tm);
+	OTJ_Timer_Stop(tm);
 
 
-	tm = start_timer("Solve Problem");
+	tm = OTJ_Timer_Start("Solve Problem");
 	Stepsize h = stepsize_from_grid_options(go);
 
 	Grid current_grid = createDeviceGrid(initial_conditions);
@@ -51,11 +51,11 @@ int main(int argc, char** argv) {
 	}
 	Grid solution_grid = alloc_grid(go.len_x, go.len_y);
 	retrieveDeviceGrid(solution_grid, current_grid);
-	stop_timer(tm);
+	OTJ_Timer_Stop(tm);
 
-	tm = start_timer("Store Grid");
+	tm = OTJ_Timer_Start("Store Grid");
 	store_grid(solution_grid);
-	stop_timer(tm);
+	OTJ_Timer_Stop(tm);
 	
 	return 0;
 }

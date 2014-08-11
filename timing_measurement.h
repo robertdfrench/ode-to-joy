@@ -1,11 +1,11 @@
 #ifndef OTJ_TIMING_MEASUREMENT
 #define OTJ_TIMING_MEASUREMENT 1
-typedef struct timing_measurement_t {
+typedef struct OTJ_Timer_t {
 	double beginning;
 	double end;
 	char* message;
-} TimingMeasurement;
+} OTJ_Timer;
 
-void stop_timer(TimingMeasurement tm);
-TimingMeasurement start_timer(char* message);
+void OTJ_Timer_Stop(OTJ_Timer tm);
+OTJ_Timer OTJ_Timer_Start(char* message);
 #endif
