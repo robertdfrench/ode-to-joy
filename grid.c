@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "grid.h"
-void store_grid(Grid g) {
+void OTJ_Grid_Store(OTJ_Grid g) {
 	FILE* gridFile = fopen("output.otj_grid","w");
 	size_t num_cells = g.len_x * g.len_y;
 	size_t cell_size = sizeof(double);
@@ -11,8 +11,8 @@ void store_grid(Grid g) {
 	}
 }
 
-Grid alloc_grid(int len_x, int len_y) {
-	Grid g;
+OTJ_Grid OTJ_Grid_Alloc(int len_x, int len_y) {
+	OTJ_Grid g;
 	g.len_x = len_x;
 	g.len_y = len_y;
 	g.internal_storage = (double*)malloc(sizeof(double) * len_x * len_y);
