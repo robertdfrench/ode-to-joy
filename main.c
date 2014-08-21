@@ -10,6 +10,17 @@
 #include "grid_options.h"
 #include "timing_measurement.h"
 
+
+double analytic_solution(double x, double y, double t) {
+	int infinity = 20;
+	int r;
+	double sum = 0.0;
+	for(r = 1; r < infinity; r++) {
+		sum += (1 - pow(-1,r)) * sin(0.5 * r * M_PI * x) * pow(M_E,-0.25 * M_PI * M_PI * (r * r + 1) * t);
+	}
+	return sin(0.5 * M_PI * y) * sum;
+}
+
 OTJ_Grid generate_initial_conditions(int len_x, int len_y) {
 	OTJ_Grid initial_conditions = OTJ_Grid_Alloc(len_x, len_y);
 	int i,j;
@@ -22,19 +33,19 @@ OTJ_Grid generate_initial_conditions(int len_x, int len_y) {
 	return initial_conditions;
 }
 
-void populate_analytic_solution(OTJ_Grid g, int tau) {
+void populate_analytic_solution(OTJ_Grid g, Stepsize h, int tau) {
 	int i,j;
 	for (i = 0; i < g.len_x; i++) {
 		for (j = 0; j < g.len_y; j++) {
-			OTJ_Grid_Element(g,i,j) = analytic_solution(g.hx * i, g.hy * j, g.ht * tau);
+			OTJ_Grid_Element(g,i,j) = analytic_solution(h.x * i, h.y * j, h.t * tau);
 		}
 	}
 }
 
 void calculate_error(OTJ_Grid error, OTJ_Grid analytic, OTJ_Grid numerical) {
 	int i,j;
-	for (i = 0; i < g.len_x; i++) {
-		for (j = 0; j < g.len_y; j++) {
+	for (i = 0; i < error.len_x; i++) {
+		for (j = 0; j < error.len_y; j++) {
 			OTJ_Grid_Element(error,i,j) = abs(OTJ_Grid_Element(analytic,i,j) - OTJ_Grid_Element(numerical,i,j));
 		}
 	}
@@ -43,23 +54,13 @@ void calculate_error(OTJ_Grid error, OTJ_Grid analytic, OTJ_Grid numerical) {
 double global_error(OTJ_Grid error) {
 	double max = 0.0;
 	int i,j;
-	for (i = 0; i < g.len_x; i++) {
-		for (j = 0; j < g.len_y; j++) {
+	for (i = 0; i < error.len_x; i++) {
+		for (j = 0; j < error.len_y; j++) {
 			double e = OTJ_Grid_Element(error,i,j);
 			max = (e > max) ? e : max;
 		}
 	}
 	return max;
-}
-
-double analytic_solution(double x, double y, double t) {
-	int infinity = 20;
-	int r;
-	double sum = 0.0;
-	for(r = 1; r < infinity; r++) {
-		sum += (1 - pow(-1,r)) * sin(0.5 * r * PI * x) * pow(E,-0.25 * PI * PI * (r * r + 1) * t);
-	}
-	return sin(0.5 * PI * y) * sum;
 }
 
 void swap_grids(OTJ_Grid a, OTJ_Grid b) {
@@ -95,7 +96,7 @@ int main(int argc, char** argv) {
 
 	tm = OTJ_Timer_Start("Compare to analytic Solution");
 	OTJ_Grid analytic_grid = OTJ_Grid_Alloc(go.len_x, go.len_y);
-	populate_analytic_solution(analytic_grid);
+	populate_analytic_solution(analytic_grid,h,tau);
 	// Overwrite analytic soln with error
 	calculate_error(analytic_grid, analytic_grid, solution_grid);
 	double gte = global_error(analytic_grid);
@@ -107,5 +108,6 @@ int main(int argc, char** argv) {
 	OTJ_Grid_Store(solution_grid);
 	OTJ_Timer_Stop(tm);
 	
+	MPI_Finalize();
 	return 0;
 }
