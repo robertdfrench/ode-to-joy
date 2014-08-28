@@ -3,8 +3,8 @@ otj.exe: main.c solve_interior.o grid.o stepsize.o grid_options.o timing_measure
 	$(MPICC) $(DEBUG) -o otj.exe $(CUDA_LIBRARY_PATH) -lcudart solve_interior.o grid.o stepsize.o grid_options.o timing_measurement.o main.c
 	cp otj.exe $(DESTINATION)
 
-grid.o: grid.c grid.h
-	$(MPICC)  $(DEBUG) -c grid.c
+grid.o: grid.cu grid.h
+	$(NVCC) $(DEBUG) -c grid.cu
 
 stepsize.o: stepsize.c stepsize.h grid_options.o
 	$(MPICC)  $(DEBUG) -c stepsize.c
@@ -12,7 +12,7 @@ stepsize.o: stepsize.c stepsize.h grid_options.o
 grid_options.o: grid_options.c grid_options.h
 	$(MPICC)  $(DEBUG) -c grid_options.c
 
-solve_interior.o: solve_interior.cu
+solve_interior.o: solve_interior.cu solve_interior.h
 	$(NVCC) $(DEBUG)  -c solve_interior.cu
 
 timing_measurement.o: timing_measurement.c timing_measurement.h
