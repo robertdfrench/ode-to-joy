@@ -18,3 +18,19 @@ OTJ_Grid OTJ_Grid_Alloc(int len_x, int len_y) {
 	g.internal_storage = (double*)malloc(sizeof(double) * len_x * len_y);
 	return g;
 }
+
+extern "C" OTJ_Grid createDeviceGrid(OTJ_Grid host_grid) {
+	OTJ_Grid device_grid = host_grid;
+	cudaMalloc(&device_grid.internal_storage, OTJ_Grid_Size(host_grid));
+	return device_grid;
+}
+
+extern "C" OTJ_Grid createAndCopyDeviceGrid(OTJ_Grid host_grid) {
+	OTJ_Grid device_grid = createDeviceGrid(host_grid);
+	cudaMemcpy(device_grid.internal_storage, host_grid.internal_storage, OTJ_Grid_Size(device_grid), cudaMemcpyHostToDevice);
+	return device_grid;
+}
+
+extern "C" void retrieveDeviceGrid(OTJ_Grid host_grid, OTJ_Grid device_grid) {
+	cudaMemcpy(host_grid.internal_storage, device_grid.internal_storage, OTJ_Grid_Size(device_grid), cudaMemcpyDeviceToHost);
+}
