@@ -1,5 +1,7 @@
-#include "grid.h"
 #include <cuda.h>
+extern "C" {
+#include "grid.h"
+}
 
 extern "C" OTJ_Grid createDeviceGrid(OTJ_Grid host_grid) {
 	OTJ_Grid device_grid = host_grid;

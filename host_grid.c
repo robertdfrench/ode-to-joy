@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "otj_grid.h"
+#include "grid.h"
 
 
 OTJ_Grid OTJ_Grid_Alloc(int len_x, int len_y) {
