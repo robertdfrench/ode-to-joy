@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "grid_options.h"
 
 GridOptions parse_grid_options(int argc, char** argv) {
