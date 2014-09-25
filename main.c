@@ -9,6 +9,7 @@
 #include "solve_interior.h"
 #include "grid_options.h"
 #include "timing_measurement.h"
+#include "error.h"
 
 
 double analytic_solution(double x, double y, double t) {
@@ -40,41 +41,6 @@ void populate_analytic_solution(OTJ_Grid g, Stepsize h, int tau) {
 			OTJ_Grid_Element(g,i,j) = analytic_solution(h.x * i, h.y * j, h.t * tau);
 		}
 	}
-}
-
-void calculate_error(OTJ_Grid error, OTJ_Grid analytic, OTJ_Grid numerical) {
-	int i,j;
-	for (i = 0; i < error.len_x; i++) {
-		for (j = 0; j < error.len_y; j++) {
-			double a = OTJ_Grid_Element(analytic,i,j);
-			double n = OTJ_Grid_Element(numerical,i,j);
-			
-			OTJ_Grid_Element(error,i,j) = abs(n - a);
-		}
-	}
-}
-
-double global_error(OTJ_Grid error) {
-	double max = 0.0;
-	int i,j;
-	for (i = 0; i < error.len_x; i++) {
-		for (j = 0; j < error.len_y; j++) {
-			double e = OTJ_Grid_Element(error,i,j);
-			max = (e > max) ? e : max;
-		}
-	}
-	return max;
-}
-
-double total_error(OTJ_Grid error) {
-	double total_error = 0.0;
-	int i,j;
-	for (i = 0; i < error.len_x; i++) {
-		for (j = 0; j < error.len_y; j++) {
-			total_error += OTJ_Grid_Element(error,i,j);
-		}
-	}
-	return total_error;
 }
 
 void swap_grids(OTJ_Grid* a, OTJ_Grid* b) {
@@ -112,9 +78,9 @@ int main(int argc, char** argv) {
 	OTJ_Grid analytic_grid = OTJ_Grid_Alloc(go.len_x, go.len_y);
 	populate_analytic_solution(analytic_grid,h,tau);
 	// Overwrite analytic soln with error
-	calculate_error(analytic_grid, analytic_grid, solution_grid);
-	double gte = global_error(analytic_grid);
-	double tote = total_error(analytic_grid);
+	OTJ_Calculate_Error(analytic_grid, analytic_grid, solution_grid);
+	double gte = OTJ_Global_Error(analytic_grid);
+	double tote = OTJ_Total_Error(analytic_grid);
 	OTJ_Timer_Stop(tm);
 
 	printf("Global Truncation Error: %f\n",gte);

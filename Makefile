@@ -1,6 +1,6 @@
 include make.inc
-otj.exe: main.c solve_interior.o host_grid.o device_grid.o stepsize.o grid_options.o timing_measurement.o
-	$(MPICC) $(DEBUG) -o otj.exe $(CUDA_LIBRARY_PATH) -lcudart solve_interior.o device_grid.o host_grid.o stepsize.o grid_options.o timing_measurement.o main.c
+otj.exe: main.c solve_interior.o host_grid.o device_grid.o stepsize.o grid_options.o timing_measurement.o error.o
+	$(MPICC) $(DEBUG) -o otj.exe $(CUDA_LIBRARY_PATH) -lcudart solve_interior.o device_grid.o host_grid.o stepsize.o grid_options.o timing_measurement.o error.o main.c
 	cp otj.exe $(DESTINATION)
 
 device_grid.o: device_grid.cu grid.h
@@ -21,6 +21,8 @@ solve_interior.o: solve_interior.cu solve_interior.h
 timing_measurement.o: timing_measurement.c timing_measurement.h
 	$(MPICC) $(DEBUG)  -c timing_measurement.c
 
+error.o: error.c error.h grid.h
+	$(MPICC) $(DEBUG) -c error.c
 clean:
 	rm -f *.o
 	rm -f *.exe
