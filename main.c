@@ -43,12 +43,6 @@ void populate_analytic_solution(OTJ_Grid g, Stepsize h, int tau) {
 	}
 }
 
-void swap_grids(OTJ_Grid* a, OTJ_Grid* b) {
-	double* temp = a->internal_storage;
-	a->internal_storage = b->internal_storage;
-	b->internal_storage = temp;
-}
-
 int main(int argc, char** argv) {
 	MPI_Init(&argc, &argv);
 	GridOptions go = parse_grid_options(argc, argv);
@@ -63,10 +57,10 @@ int main(int argc, char** argv) {
 
 	OTJ_Grid current_grid = createDeviceGrid(initial_conditions);
 	OTJ_Grid previous_grid = createAndCopyDeviceGrid(initial_conditions);
-	swap_grids(&current_grid, &previous_grid);
+	OTJ_Grid_Swap(&current_grid, &previous_grid);
 	int tau;
 	for(tau = 1; tau < go.len_t; tau++) {
-		swap_grids(&current_grid, &previous_grid);
+		OTJ_Grid_Swap(&current_grid, &previous_grid);
 		apply_boundary_conditions(current_grid);
 		solve_interior(current_grid, previous_grid,h);
 	}

@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include "grid.h"
 
+void OTJ_Grid_Swap(OTJ_Grid* a, OTJ_Grid* b) {
+	double* temp = a->internal_storage;
+	a->internal_storage = b->internal_storage;
+	b->internal_storage = temp;
+}
 
 OTJ_Grid OTJ_Grid_Alloc(int len_x, int len_y) {
 	OTJ_Grid g;

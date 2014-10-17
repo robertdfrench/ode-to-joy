@@ -11,6 +11,7 @@ typedef struct OTJ_Grid_t {
 
 void OTJ_Grid_Store(OTJ_Grid g);
 OTJ_Grid OTJ_Grid_Alloc(int len_x, int len_y);
+void OTJ_Grid_Swap(OTJ_Grid* a, OTJ_Grid* b);
 
 OTJ_Grid createDeviceGrid(OTJ_Grid host_grid);
 OTJ_Grid createAndCopyDeviceGrid(OTJ_Grid host_grid);
